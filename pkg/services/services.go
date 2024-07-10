@@ -253,11 +253,16 @@ func (n *Notification) getTemplater(name string, f texttemplate.FuncMap, sources
 		return nil, err
 	}
 
+	fmt.Println("JGW, getTemplater 1")
+
 	templaters := []Templater{func(notification *Notification, vars map[string]interface{}) error {
 		var messageData bytes.Buffer
+		fmt.Println("JGW, getTemplater 1a")
 		if err := message.Execute(&messageData, vars); err != nil {
+			fmt.Println("JGW, getTemplater 1ae", err)
 			return err
 		}
+		fmt.Println("JGW, getTemplater 1b")
 		if val := messageData.String(); val != "" {
 			notification.Message = messageData.String()
 		}
@@ -273,6 +278,7 @@ func (n *Notification) getTemplater(name string, f texttemplate.FuncMap, sources
 		templaters = append(templaters, t)
 	}
 
+	fmt.Println("JGW, getTemplater 3")
 	return func(notification *Notification, vars map[string]interface{}) error {
 		for _, t := range templaters {
 			if err := t(notification, vars); err != nil {

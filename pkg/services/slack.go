@@ -30,41 +30,57 @@ type SlackNotification struct {
 }
 
 func (n *SlackNotification) GetTemplater(name string, f texttemplate.FuncMap) (Templater, error) {
+
+	fmt.Println("JGW, GetTemplate in SlackNotification 0a")
 	slackAttachments, err := texttemplate.New(name).Funcs(f).Parse(n.Attachments)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("JGW, GetTemplate in SlackNotification 0b")
 	slackBlocks, err := texttemplate.New(name).Funcs(f).Parse(n.Blocks)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("JGW, GetTemplate in SlackNotification 0c")
 	groupingKey, err := texttemplate.New(name).Funcs(f).Parse(n.GroupingKey)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("JGW, GetTemplate in SlackNotification 0d")
 
 	return func(notification *Notification, vars map[string]interface{}) error {
+
+		fmt.Println("JGW, GetTemplate in SlackNotification 1")
+
 		if notification.Slack == nil {
 			notification.Slack = &SlackNotification{}
 		}
+		fmt.Println("JGW, GetTemplate in SlackNotification 2")
 		var slackAttachmentsData bytes.Buffer
 		if err := slackAttachments.Execute(&slackAttachmentsData, vars); err != nil {
+			fmt.Println("JGW, GetTemplate in SlackNotification 2a")
 			return err
 		}
 		notification.Slack.Attachments = slackAttachmentsData.String()
 
+		fmt.Println("JGW, GetTemplate in SlackNotification 3")
 		var slackBlocksData bytes.Buffer
 		if err := slackBlocks.Execute(&slackBlocksData, vars); err != nil {
+			fmt.Println("JGW, GetTemplate in SlackNotification 3a", err)
 			return err
 		}
 		notification.Slack.Blocks = slackBlocksData.String()
 
+		fmt.Println("JGW, GetTemplate in SlackNotification 4")
 		var groupingKeyData bytes.Buffer
 		if err := groupingKey.Execute(&groupingKeyData, vars); err != nil {
+			fmt.Println("JGW, GetTemplate in SlackNotification 4a", err)
 			return err
+
 		}
 		notification.Slack.GroupingKey = groupingKeyData.String()
 
+		fmt.Println("JGW, GetTemplate in SlackNotification 5")
 		notification.Slack.NotifyBroadcast = n.NotifyBroadcast
 		notification.Slack.DeliveryPolicy = n.DeliveryPolicy
 		return nil
